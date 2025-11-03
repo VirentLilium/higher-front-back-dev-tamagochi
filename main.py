@@ -1,9 +1,10 @@
 import os
 
 from game.models import Food, Medicine
-from game.tamagochi import AbstractTamagochi
-from game.clicker import AbstractClicker
-from game.game import AbstractGame
+from game.tamagochi import MyTamagochi
+from game.clicker import Clicker
+from game.game import NewGame
+from game.exceptions import NotEnoughMoney, TamagochiIsGone
 
 
 def main():
@@ -17,17 +18,11 @@ def main():
         Medicine(name='Ибупрофен', price=30, heal_hp=20, number_of_uses=2)
     ]
 
-    #  Вместо AbstractTamagochi импортируйте
-    #  и создайте инстанс от своей реализации
-    tamagochi = AbstractTamagochi()
+    tamagochi = MyTamagochi()
 
-    #  Вместо AbstractClicker импортируйте
-    #  и создайте инстанс от своей реализации
-    clicker = AbstractClicker(10, 20)
+    clicker = Clicker(10, 20)
 
-    #  Вместо AbstractGame импортируйте
-    #  и создайте инстанс от своей реализации
-    game = AbstractGame(
+    game = NewGame(
         tamagochi,
         clicker,
         all_food=all_food,
@@ -46,7 +41,8 @@ def main():
         status = game.get_status()
         print(
             f"\nСтатус: голод {status['hunger']}, здоровье {status['hp']}, "
-            f"энергия {status['energy']}, монет {status['coins']}\n"
+            f"энергия {status['energy']}, счастье {status['happiness']}, "
+            f"монет {status['coins']}\n"
         )
         if game.tamagochi.is_sick():
             print("=======Тамагочи болеет======")
@@ -64,14 +60,23 @@ def main():
             case "1":
                 income = game.work()
                 output = f'Вы заработали {income} монет'
-                game.tamagochi.update()
+                try:
+                    game.tamagochi.update()
+                except TamagochiIsGone as e:
+                    print(e)
+                    break
             case "2":
-                game.buy_food()
+                try:
+                    game.buy_food()
+                except NotEnoughMoney as e:
+                    print(e)
             case "3":
-                game.buy_medicine()
+                try:
+                    game.buy_medicine()
+                except NotEnoughMoney as e:
+                    print(e)
             case "4":
                 game.feed_tamagochi()
-
             case "5":
                 game.heal_tamagochi()
             case "6":
