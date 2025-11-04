@@ -33,7 +33,8 @@ class Medicine:
         """
         Проверяет, осталось ли еще лекарство.
 
-        :return: True если осталось, иначе False.
+        Возвращает:
+            bool: True, если лекарство закончилось, иначе False.
         """
         return self.uses >= self.number_of_uses
 

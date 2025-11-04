@@ -1,12 +1,20 @@
-"""Модуль с интерфейсом и реализацией класса игры."""
+"""Модуль с интерфейсом и реализацией класса игры.
+
+Содержит классы, реализующие логику игры 'Тамагочи':
+    - AbstractGame: интерфейс игры.
+    - NewGame: реализация логики игры.
+"""
 
 from abc import ABC, abstractmethod
 from typing import Any
+from copy import deepcopy
 
-from .tamagochi import AbstractTamagochi
-from .clicker import AbstractClicker
-from .models import Food, Medicine
-from .exceptions import NotEnoughMoney
+from game.clicker import AbstractClicker
+from game.constants import START_COINS
+from game.exceptions import (NotEnoughMoney, NotEnoughFood, NotEnoughMedicine,
+                             TamagochiIsGone)
+from game.models import Food, Medicine
+from game.tamagochi import AbstractTamagochi
 
 
 class AbstractGame(ABC):
@@ -20,61 +28,97 @@ class AbstractGame(ABC):
         all_food: list[Food],
         all_medicine: list[Medicine]
     ):
-        """
-        Абстрактный метод инициализации класса игры.
+        """Абстрактный метод инициализации класса игры.
 
-        :param tamagochi: экземпляр тамагочи.
-        :param clicker: экземпляр кликера.
-        :param all_food: все доступные варианты еды.
-        :param all_medicine: все доступные варианты лекарств.
+        Аргументы:
+            tamagochi (AbstractTamagochi): экземпляр класса тамагочи.
+            clicker (AbstractClicker): экземпляр класса кликера.
+            all_food (list[Food]): список вариантов еды.
+            all_medicine (list[Medicine]): список вариантов лекарств.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
         """
         raise NotImplementedError
 
     @abstractmethod
     def work(self) -> int:
         """
-        Абстрактный метод для логики действия "работа.
+        Абстрактный метод для логики действия 'работа'.
+        Позволяет зарабатывать монеты.
 
-        :return: количество заработанных монет.
+        Возвращает:
+            int: количество заработанных монет.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
         """
         raise NotImplementedError
 
     @abstractmethod
     def buy_food(self) -> None:
-        """Абстрактный метод для покупки еды."""
+        """Абстрактный метод для покупки еды для питомца.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
+        """
         raise NotImplementedError
 
     @abstractmethod
     def buy_medicine(self) -> None:
-        """Абстрактный метод для покупки лекарства."""
+        """Абстрактный метод для покупки лекарства для питомца.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
+        """
         raise NotImplementedError
 
     @abstractmethod
     def feed_tamagochi(self) -> None:
-        """Абстрактный метод для кормления тамагочи."""
+        """Абстрактный метод для кормления тамагочи.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
+        """
         raise NotImplementedError
 
     @abstractmethod
     def heal_tamagochi(self) -> None:
-        """Абстрактный метод для лечения тамагочи."""
+        """Абстрактный метод для лечения тамагочи.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
+        """
         raise NotImplementedError
 
     @abstractmethod
     def rest_tamagochi(self):
-        """Абстрактный метод для отдыха тамагочи."""
+        """Абстрактный метод для отдыха тамагочи.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
+        """
         raise NotImplementedError
 
     @abstractmethod
     def play_with_tamagochi(self):
-        """Абстрактный метод для игры с тамагочи."""
+        """Абстрактный метод для игры с тамагочи.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
+        """
         raise NotImplementedError
 
     @abstractmethod
     def get_status(self) -> dict[str, Any]:
         """
-        Абстрактный метод для получения статуса (всех характеристик) тамагочи.
+        Абстрактный метод для получения характеристик тамагочи и игры.
 
-        :return: словарь со всеми характеристиками тамагочи.
+        Возвращает:
+            dict[str, Any]: словарь с характеристиками тамагочи и игры.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
         """
         raise NotImplementedError
 
@@ -84,7 +128,11 @@ class AbstractGame(ABC):
         """
         Абстрактное свойство для доступа к сумке с едой.
 
-        :return: список с имеющимися (купленными) объектами еды.
+        Возвращает:
+            list[Food]: список с имеющимися объектами еды.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
         """
         raise NotImplementedError
 
@@ -94,7 +142,11 @@ class AbstractGame(ABC):
         """
         Абстрактное свойство для доступа к сумке с лекарствами.
 
-        :return: список с имеющимися (купленными) объектами лекарств.
+        Возвращает:
+            list[Medicine]: список с имеющимися объектами лекарств.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
         """
         raise NotImplementedError
 
@@ -109,104 +161,131 @@ class NewGame(AbstractGame):
         all_food: list[Food],
         all_medicine: list[Medicine]
     ):
-        """
-        Метод инициализации класса игры.
-
-        :param tamagochi: экземпляр тамагочи.
-        :param clicker: экземпляр кликера.
-        :param all_food: все доступные варианты еды.
-        :param all_medicine: все доступные варианты лекарств.
-        """
-        self.tamagochi = tamagochi
-        self.clicker = clicker
+        """Метод инициализации класса игры."""
+        self.tamagochi = tamagochi  # Экземпляр питомца.
+        self.clicker = clicker  # Экземпляр кликера.
         self.all_food = all_food  # Каталог всех продуктов.
         self.all_medicine = all_medicine  # Каталог всех лекарств.
-        self._food_inventory: list[Food] = []  # Сумка с купленными продуктами.
-        # Сумка с купленными лекарствами.
-        self._medicine_inventory: list[Medicine] = []
+        self._coins = START_COINS  # Кошелек игрока.
+        self._inventory: dict[str, list] = {
+            'food': [],
+            'medicine': []}  # Сумка с купленными продуктами.
 
     def work(self) -> int:
-        """
-        Метод для логики действия "работа.
+        """Метод для логики действия 'работа'.
 
-        :return: количество заработанных монет.
+        Возвращает:
+            int: количество заработанных монет.
         """
         self.clicker.click()
-        return self.clicker.income_per_click
+        salary = self.clicker.income_per_click
+        self._coins += salary
+        return salary
 
     def buy_food(self) -> None:
-        """ Метод для покупки еды."""
+        """Метод для покупки еды. Игрок выбирает продукт из списка.
+
+        Исключения:
+            NotEnoughMoney: у пользователя не хватает денег для покупки.
+        """
         while True:
             print('Доступные продукты:')
             for i, food in enumerate(self.all_food, start=1):
                 print(f'{i}. {food}.')
             try:
-                choice = int(input('Выберите номер продукта для покупки')) - 1
+                choice = int(input('Выберите номер продукта для покупки.')) - 1
                 if choice < 0 or choice >= len(self.all_food):
-                    raise ValueError('Выберите номер продукта из предложенных')
+                    raise ValueError
 
-                food_to_buy = self.all_food[choice]
+                food = self.all_food[choice]
 
-                if self.clicker.total_coins < food_to_buy.price:
-                    raise NotEnoughMoney
+                if self._coins < food.price:
+                    raise NotEnoughMoney()
 
-                self.clicker.total_coins -= food_to_buy.price
-                self._food_inventory.append(food_to_buy)
-                print(f'Вы купили {food_to_buy.name}'
-                      f'за {food_to_buy.price} монет.')
+                self._coins -= food.price
+                self.__add_food_to_inventory(food)
+
+                print(f'Вы купили {food.name}'
+                      f'за {food.price} монет.')
                 break
-            except ValueError as e:
-                print(e)
+            except ValueError:
+                print('Пожалуйста, выберите номер продукта из списка.')
+
+    def feed_tamagochi(self) -> None:
+        """Метод для кормления тамагочи."""
+        if self._inventory['food']:
+            # Берём первый элемент и удаляем из списка
+            food = self._inventory['food'].pop(0)
+            self.tamagochi.feed(food)
+            return
+        raise NotEnoughFood()
 
     def buy_medicine(self) -> None:
-        """Метод для покупки лекарства."""
+        """Метод для покупки лекарства. Игрок выбирает лекарство из списка.
+
+        Исключения:
+            NotEnoughMoney: у пользователя не хватает денег для покупки.
+        """
         while True:
             print('Доступные продукты:')
             for i, medicine in enumerate(self.all_medicine, start=1):
                 print(f'{i}. {medicine}.')
             try:
-                choice = int(input('Выберите номер лекарства для покупки')) - 1
+                choice = int(
+                    input('Выберите номер лекарства для покупки.')) - 1
                 if choice < 0 or choice >= len(self.all_medicine):
-                    raise ValueError(
-                        'Выберите номер лекарства из предложенных')
+                    raise ValueError
 
-                medicine_to_buy = self.all_medicine[choice]
+                medicine = self.all_medicine[choice]
 
-                if self.clicker.total_coins < medicine_to_buy.price:
-                    raise NotEnoughMoney
+                if self._coins < medicine.price:
+                    raise NotEnoughMoney()
 
-                self.clicker.total_coins -= medicine_to_buy.price
-                self._medicine_inventory.append(medicine_to_buy)
-                print(f'Вы купили {medicine_to_buy.name} за'
-                      f'{medicine_to_buy.price} монет.')
+                self._coins -= medicine.price
+                self.__add_medicine_to_inventory(deepcopy(medicine))
+
+                print(f'Вы купили {medicine.name} за'
+                      f'{medicine.price} монет.')
                 break
-            except ValueError as e:
-                print(e)
-
-    def feed_tamagochi(self) -> None:
-        """Метод для кормления тамагочи."""
-        raise NotImplementedError
+            except ValueError:
+                print('Выберите номер лекарства из предложенных.')
 
     def heal_tamagochi(self) -> None:
         """Метод для лечения тамагочи."""
-        raise NotImplementedError
+        if self._inventory['medicine']:
+            medicine = self._inventory['medicine'][0]
+            self.tamagochi.heal(medicine)
+            medicine.uses += 1
+            # Если лекарство использовано полностью, то удаляем из инвентаря.
+            if medicine.is_empty():
+                self._inventory['medicine'].pop(0)
+            return
+        raise NotEnoughMedicine()
 
     def rest_tamagochi(self):
         """Метод для отдыха тамагочи."""
-        raise NotImplementedError
+        self.tamagochi.rest()
 
     def play_with_tamagochi(self):
         """Метод для игры с тамагочи."""
-        raise NotImplementedError
+        self.tamagochi.play()
 
     def get_status(self) -> dict[str, Any]:
-        """
-        Метод для получения статуса (всех характеристик) тамагочи.
+        """Метод для получения характеристик тамагочи,
+        количества монет в кошельке игрока,
+        а также для обработки смерти питомца.
 
-        :return: словарь со всеми характеристиками тамагочи.
+        Возвращает:
+            dict[str, Any]: словарь со всеми характеристиками тамагочи и игры.
+
+        Исключения:
+            TamagochiIsGone: тамагочи погиб.
         """
+        if not self.tamagochi.is_alive():
+            raise TamagochiIsGone()
+
         status = self.tamagochi.status
-        status['coins'] = self.clicker.total_coins
+        status['coins'] = self._coins
         return status
 
     @property
@@ -214,15 +293,25 @@ class NewGame(AbstractGame):
         """
         Свойство для доступа к сумке с едой.
 
-        :return: список с имеющимися (купленными) объектами еды.
+        Возвращает:
+            list[Food]: список с имеющимися объектами еды.
         """
-        return self._food_inventory
+        return self._inventory['food']
 
     @property
     def medicine(self) -> list[Medicine]:
         """
         Свойство для доступа к сумке с лекарствами.
 
-        :return: список с имеющимися (купленными) объектами лекарств.
+        Возвращает:
+            list[Medicine]: список с имеющимися объектами лекарств.
         """
-        return self._medicine_inventory
+        return self._inventory['medicine']
+
+    def __add_food_to_inventory(self, food: Food) -> None:
+        """Добавляет еду в инвентарь."""
+        self._inventory['food'].append(food)
+
+    def __add_medicine_to_inventory(self, medicine: Medicine) -> None:
+        """Добавляет лекарство в инвентарь."""
+        self._inventory['medicine'].append(medicine)

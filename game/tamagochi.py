@@ -1,9 +1,16 @@
-"""Модуль с интерфейсом и реализациями класса тамагочи."""
+"""Модуль с интерфейсом и реализациями класса тамагочи.
+
+Содержит:
+- AbstractTamagochi: абстрактный класс для описания логики тамагочи.
+- MyTamagochi: реализация тамагочи.
+- Модели: Food(еда), Medicine(лекарство).
+"""
 
 from abc import ABC, abstractmethod
 
 from .models import Food, Medicine
-from .exceptions import TamagochiIsGone
+from .constants import (MIN_HP, MAX_HP, MIN_ENERGY, MAX_ENERGY, MIN_HUNGER,
+                        MAX_HUNGER, HUNGER_LEVEL_TO_SICK)
 
 
 class AbstractTamagochi(ABC):
@@ -14,18 +21,30 @@ class AbstractTamagochi(ABC):
         """
         Абстрактный метод для кормления тамагочи.
 
-        :param food: объект еды для кормления.
+        Аргументы:
+            food (Food): объект еды для кормления.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
         """
         raise NotImplementedError
 
     @abstractmethod
     def play(self) -> None:
-        """Абстрактный метод для игры с тамагочи."""
+        """Абстрактный метод для игры с тамагочи.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
+        """
         raise NotImplementedError
 
     @abstractmethod
     def rest(self) -> None:
-        """Абстрактный метод для отдыха тамагочи."""
+        """Абстрактный метод для отдыха тамагочи.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -33,7 +52,11 @@ class AbstractTamagochi(ABC):
         """
         Абстрактный метод для лечения тамагочи.
 
-        :param medicine: лекарство для лечения.
+        Аргументы:
+            medicine (Medicine): лекарство для лечения.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
         """
         raise NotImplementedError
 
@@ -43,16 +66,24 @@ class AbstractTamagochi(ABC):
         """
         Абстрактное свойство для доступа ко всем состояниям тамагочи.
 
-        :return: словарь со всеми состояниями тамагочи.
+        Возвращает:
+            dict[str, int]: словарь показателей состояния тамагочи.
+
+        Исключения:
+            NotImplementedError: свойство должно быть реализовано в наследнике.
         """
         raise NotImplementedError
 
     @abstractmethod
     def is_alive(self) -> bool:
         """
-        Абстрактный метод для проверки жив ли тамагочи.
+        Абстрактный метод для проверки, жив ли тамагочи.
 
-        :return: True если жив, иначе False.
+        Возвращает:
+            bool: True, если питомец жив, иначе False.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
         """
         raise NotImplementedError
 
@@ -61,7 +92,11 @@ class AbstractTamagochi(ABC):
         """
         Абстрактный метод для проверки, не заболел ли тамагочи.
 
-        :return: True если тамагочи болеет, иначе False.
+        Возвращает:
+            bool: True, если питомец болеет, иначе False.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
         """
         raise NotImplementedError
 
@@ -69,118 +104,92 @@ class AbstractTamagochi(ABC):
     def update(self) -> None:
         """
         Абстрактный метод для обновления состояний тамагочи.
-        Должен использоваться после каждого взаимодействия с тамагочи.
+
+        Вызывается каждый тик игры для изменения состояния питомца.
+
+        Исключения:
+            NotImplementedError: метод должен быть реализован в наследнике.
         """
         raise NotImplementedError
 
 
 class MyTamagochi(AbstractTamagochi):
     """Класс тамагочи."""
-    MAX_HUNGER = 100
-    MAX_HP = 100
-    MAX_ENERGY = 100
-    MAX_HAPPINESS = 100
 
     def __init__(self) -> None:
-        """Метод инициализации тамагочи. Устанавливает стартовые показатели
-        здоровья, энергии и голода."""
-        self.hunger = 0  # Голод.
-        self.hp = self.MAX_HP  # Здоровье.
-        self.energy = self.MAX_ENERGY  # Энергия.
-        self.happiness = self.MAX_HAPPINESS  # Счастье.
+        """Метод инициализации тамагочи. Устанавливает стартовые показатели."""
+        self._hunger = MIN_HUNGER  # Голод.
+        self._hp = MAX_HP  # Здоровье.
+        self._energy = MAX_ENERGY  # Энергия.
 
     def feed(self, food: Food) -> None:
         """
         Метод для кормления тамагочи.
 
-        :param food: объект еды для кормления.
+        Аргументы:
+            food (Food): еда для питомца.
         """
-        self.hunger -= food.satiety
+        self._hunger = max(MIN_HUNGER, self._hunger - food.satiety)
 
     def play(self) -> None:
         """Метод для игры с тамагочи."""
 
-        self.happiness += 20
-        self.energy -= 10
-        self.hunger += 5
+        self._energy = max(MIN_ENERGY, self._energy - 10)
+        self._hunger = min(MAX_HUNGER, self._hunger + 5)
 
     def rest(self) -> None:
         """Метод для отдыха тамагочи."""
-        if self.is_sick():  # В случае болезни увеличивается только энергия.
-            self.energy += 5
+        if self.is_sick():
+            self._energy = min(MAX_ENERGY, self._energy + 5)
         else:
-            self.energy += 15
-            self.happiness += 5
-            self.hp += 10
+            self._energy = min(MAX_ENERGY, self._energy + 15)
 
     def heal(self, medicine: Medicine) -> None:
         """
         Метод для лечения тамагочи.
 
-        :param medicine: лекарство для лечения.
+        Аргументы:
+            medicine (Medicine): лекарство, увеличивает здоровье.
         """
-        self.hp += medicine.heal_hp
+        self._hp = min(MAX_HP, self._hp + medicine.heal_hp)
 
     @property
     def status(self) -> dict[str, int]:
         """
         Свойство для доступа ко всем состояниям тамагочи.
 
-        :return: словарь со всеми состояниями тамагочи.
+        Возвращает:
+            dict[str, int]: показатели питомца: голод, здоровье, энергия.
         """
-        tamagochi_status = {'hunger': self.hunger,
-                            'hp': self.hp,
-                            'energy': self.energy,
-                            'happiness': self.happiness}
-        return tamagochi_status
+        return {'hunger': self._hunger,
+                'hp': self._hp,
+                'energy': self._energy}
 
     def is_alive(self) -> bool:
         """
-        Метод для проверки жив ли тамагочи.
+        Метод для проверки, жив ли тамагочи.
 
-        :return: True если жив, иначе False.
+        Возвращает:
+            bool: True, если питомец жив, иначе False.
         """
-        return True if self.hp > 0 else False
+        return self._hp > MIN_HP
 
     def is_sick(self) -> bool:
-        """
-        Метод для проверки, не заболел ли тамагочи.
+        """Метод для проверки, не заболел ли тамагочи.
 
-        :return: True если тамагочи болеет, иначе False.
+        Возвращает:
+            bool: True, если питомец болен, иначе False.
         """
-        tamagochi_is_sick = False
-
-        if self.happiness < 20 or self.hp < 30 or self.hunger > 80:
-            tamagochi_is_sick = True
-        return tamagochi_is_sick
+        return (self._hunger >= HUNGER_LEVEL_TO_SICK
+                or self._energy <= MIN_ENERGY)
 
     def update(self) -> None:
-        """
-        Метод для обновления состояний тамагочи.
-        Должен использоваться после каждого тика игры.
-        """
+        """Метод обновляет состояния тамагочи после каждого хода."""
+
         # Стандартная динамика.
-        self.energy -= 5
-        self.happiness -= 5
-        self.hunger += 5
+        self._energy = max(MIN_ENERGY, self._energy - 5)
+        self._hunger = min(MAX_HUNGER, self._hunger + 5)
 
-        # Если питомец болен, дополнительно уменьшаем показатели.
+        # Если питомец болен, дополнительно уменьшается здоровье.
         if self.is_sick():
-            self.energy -= 5
-            self.happiness -= 5
-            self.hp -= 5
-
-        if not self.is_alive():
-            raise TamagochiIsGone
-
-        self._check_limits()
-
-    def _check_limits(self) -> None:
-        """
-        Служебный метод для корректировки показателей,
-        чтобы не было выхода за границы.
-        """
-        self.hunger = min(max(self.hunger, 0), self.MAX_HUNGER)
-        self.hp = min(max(self.hp, 0), self.MAX_HP)
-        self.energy = min(max(self.energy, 0), self.MAX_ENERGY)
-        self.happiness = min(max(self.happiness, 0), self.MAX_HAPPINESS)
+            self._hp = max(MIN_HP, self._hp - 5)
