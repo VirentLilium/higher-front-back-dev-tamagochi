@@ -133,7 +133,6 @@ class MyTamagochi(AbstractTamagochi):
 
     def play(self) -> None:
         """Метод для игры с тамагочи."""
-
         self._energy = max(MIN_ENERGY, self._energy - 10)
         self._hunger = min(MAX_HUNGER, self._hunger + 5)
 
@@ -185,7 +184,6 @@ class MyTamagochi(AbstractTamagochi):
 
     def update(self) -> None:
         """Метод обновляет состояния тамагочи после каждого хода."""
-
         # Стандартная динамика.
         self._energy = max(MIN_ENERGY, self._energy - 5)
         self._hunger = min(MAX_HUNGER, self._hunger + 5)

@@ -6,8 +6,8 @@
 """
 
 from abc import ABC, abstractmethod
-from typing import Any
 from copy import deepcopy
+from typing import Any
 
 from game.clicker import AbstractClicker
 from game.constants import START_COINS
@@ -178,38 +178,13 @@ class NewGame(AbstractGame):
             int: количество заработанных монет.
         """
         self.clicker.click()
-        salary = self.clicker.income_per_click
-        self._coins += salary
-        return salary
+        new_coins = self.clicker.income_per_click
+        self._coins += new_coins
+        return new_coins
 
     def buy_food(self) -> None:
-        """Метод для покупки еды. Игрок выбирает продукт из списка.
-
-        Исключения:
-            NotEnoughMoney: у пользователя не хватает денег для покупки.
-        """
-        while True:
-            print('Доступные продукты:')
-            for i, food in enumerate(self.all_food, start=1):
-                print(f'{i}. {food}.')
-            try:
-                choice = int(input('Выберите номер продукта для покупки.')) - 1
-                if choice < 0 or choice >= len(self.all_food):
-                    raise ValueError
-
-                food = self.all_food[choice]
-
-                if self._coins < food.price:
-                    raise NotEnoughMoney()
-
-                self._coins -= food.price
-                self.__add_food_to_inventory(food)
-
-                print(f'Вы купили {food.name}'
-                      f'за {food.price} монет.')
-                break
-            except ValueError:
-                print('Пожалуйста, выберите номер продукта из списка.')
+        """Метод для покупки еды."""
+        self.__buy_item(self.all_food, self.__add_food_to_inventory)
 
     def feed_tamagochi(self) -> None:
         """Метод для кормления тамагочи."""
@@ -221,34 +196,8 @@ class NewGame(AbstractGame):
         raise NotEnoughFood()
 
     def buy_medicine(self) -> None:
-        """Метод для покупки лекарства. Игрок выбирает лекарство из списка.
-
-        Исключения:
-            NotEnoughMoney: у пользователя не хватает денег для покупки.
-        """
-        while True:
-            print('Доступные продукты:')
-            for i, medicine in enumerate(self.all_medicine, start=1):
-                print(f'{i}. {medicine}.')
-            try:
-                choice = int(
-                    input('Выберите номер лекарства для покупки.')) - 1
-                if choice < 0 or choice >= len(self.all_medicine):
-                    raise ValueError
-
-                medicine = self.all_medicine[choice]
-
-                if self._coins < medicine.price:
-                    raise NotEnoughMoney()
-
-                self._coins -= medicine.price
-                self.__add_medicine_to_inventory(deepcopy(medicine))
-
-                print(f'Вы купили {medicine.name} за'
-                      f'{medicine.price} монет.')
-                break
-            except ValueError:
-                print('Выберите номер лекарства из предложенных.')
+        """Метод для покупки лекарства."""
+        self.__buy_item(self.all_medicine, self.__add_medicine_to_inventory)
 
     def heal_tamagochi(self) -> None:
         """Метод для лечения тамагочи."""
@@ -307,6 +256,40 @@ class NewGame(AbstractGame):
             list[Medicine]: список с имеющимися объектами лекарств.
         """
         return self._inventory['medicine']
+
+    def __buy_item(self, items: list, add_to_inventory_func) -> None:
+        """Универсальный метод для покупки еды или лекарства.
+        Игрок выбирает товар из списка.
+
+        Исключения:
+            NotEnoughMoney: у пользователя не хватает денег для покупки.
+        """
+        while True:
+            print('Доступные товары:')
+            for i, item in enumerate(items, start=1):
+                print(f'{i}. {item}.')
+            try:
+                choice = int(input('Выберите номер товара для покупки.')) - 1
+                if choice < 0 or choice >= len(items):
+                    raise ValueError
+
+                item = items[choice]
+
+                if self._coins < item.price:
+                    raise NotEnoughMoney()
+
+                self._coins -= item.price
+
+                if items is self.all_medicine:
+                    add_to_inventory_func(deepcopy(item))
+                else:
+                    add_to_inventory_func(item)
+
+                print(f'Вы купили {item.name} за {item.price} монет.')
+                break
+
+            except ValueError:
+                print('Пожалуйста, выберите номер товара из списка.')
 
     def __add_food_to_inventory(self, food: Food) -> None:
         """Добавляет еду в инвентарь."""

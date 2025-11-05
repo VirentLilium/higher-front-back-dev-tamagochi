@@ -9,6 +9,7 @@ from game.exceptions import (NotEnoughMoney, NotEnoughFood,
 
 
 def main():
+    """Запускаем игру."""
     all_food = [
         Food(name='Бургер', satiety=20, price=40),
         Food(name='Салат', satiety=10, price=20),

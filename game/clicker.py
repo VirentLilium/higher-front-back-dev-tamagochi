@@ -42,7 +42,7 @@ class AbstractClicker(ABC):
 
 
 class Clicker(AbstractClicker):
-    """Класс кликера. Реализация кликера со случайным доходом за клик"""
+    """Класс кликера. Реализация кликера со случайным доходом за клик."""
 
     def __init__(self, min_coins: int, max_coins: int) -> None:
         """Инициализация кликера.
