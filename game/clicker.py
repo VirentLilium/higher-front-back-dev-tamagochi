@@ -14,7 +14,8 @@ class AbstractClicker(ABC):
 
     @abstractmethod
     def __init__(self) -> None:
-        """Абстрактный метод инициализации.
+        """
+        Абстрактный метод инициализации.
 
         Исключения:
             NotImplementedError: метод должен быть реализован в наследнике.
@@ -23,7 +24,8 @@ class AbstractClicker(ABC):
 
     @abstractmethod
     def click(self) -> None:
-        """Абстрактный метод клика для накапливания монет.
+        """
+        Абстрактный метод клика для накапливания монет.
 
         Исключения:
             NotImplementedError: метод должен быть реализован в наследнике.
@@ -33,7 +35,8 @@ class AbstractClicker(ABC):
     @property
     @abstractmethod
     def income_per_click(self) -> int:
-        """Абстрактное свойство для доступа к количеству монет за клик.
+        """
+        Абстрактное свойство для доступа к количеству монет за клик.
 
         Исключения:
             NotImplementedError: метод должен быть реализован в наследнике.
@@ -45,7 +48,8 @@ class Clicker(AbstractClicker):
     """Класс кликера. Реализация кликера со случайным доходом за клик."""
 
     def __init__(self, min_coins: int, max_coins: int) -> None:
-        """Инициализация кликера.
+        """
+        Инициализация кликера.
 
         Аргументы:
             min_coins (int): минимальное количество монет за клик.

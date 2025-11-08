@@ -3,6 +3,7 @@ import os
 from game.models import Food, Medicine
 from game.tamagochi import MyTamagochi
 from game.clicker import Clicker
+from game.constants import STATUS_TEMPLATE, TAMAGOCHI_IS_SICK, PLAYER_ACTIONS
 from game.game import NewGame
 from game.exceptions import (NotEnoughMoney, NotEnoughFood,
                              NotEnoughMedicine, TamagochiIsGone)
@@ -35,30 +36,17 @@ def main():
     output = ''
 
     while True:
-        print(output)
-
-        print(f"Сумка с едой: {game.food}")
-        print(f"Сумка с лекарствами: {game.medicine}")
+        print(f"{output}\n"
+              f"Сумка с едой: {game.food}\n"
+              f"Сумка с лекарствами: {game.medicine}")
 
         try:
-            status = game.get_status()
-
-            print(f"\nСтатус: голод {status['hunger']}, "
-                  f"здоровье {status['hp']}, "
-                  f"энергия {status['energy']}, монет {status['coins']}\n")
+            print(STATUS_TEMPLATE.format(**game.get_status()))
 
             if game.tamagochi.is_sick():
-                print("=======Тамагочи болеет======")
-                print("=======Отдых действует менее эффективно=======")
+                print(TAMAGOCHI_IS_SICK)
 
-            print("1. Пойти на работу")
-            print("2. Купить еду")
-            print("3. Купить лекарство")
-            print("4. Покормить")
-            print("5. Вылечить")
-            print("6. Играть")
-            print("7. Отдых")
-            print("0. Выход")
+            print(PLAYER_ACTIONS)
 
             match input("Выберите действие: "):
                 case "1":

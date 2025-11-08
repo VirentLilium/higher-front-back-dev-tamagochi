@@ -31,7 +31,8 @@ class AbstractTamagochi(ABC):
 
     @abstractmethod
     def play(self) -> None:
-        """Абстрактный метод для игры с тамагочи.
+        """
+        Абстрактный метод для игры с тамагочи.
 
         Исключения:
             NotImplementedError: метод должен быть реализован в наследнике.
@@ -40,7 +41,8 @@ class AbstractTamagochi(ABC):
 
     @abstractmethod
     def rest(self) -> None:
-        """Абстрактный метод для отдыха тамагочи.
+        """
+        Абстрактный метод для отдыха тамагочи.
 
         Исключения:
             NotImplementedError: метод должен быть реализован в наследнике.
@@ -117,10 +119,17 @@ class MyTamagochi(AbstractTamagochi):
     """Класс тамагочи."""
 
     def __init__(self) -> None:
-        """Метод инициализации тамагочи. Устанавливает стартовые показатели."""
-        self._hunger = MIN_HUNGER  # Голод.
-        self._hp = MAX_HP  # Здоровье.
-        self._energy = MAX_ENERGY  # Энергия.
+        """
+        Метод инициализации тамагочи.
+
+        Атрибуты:
+            hunger (int): голод.
+            hp (int): здоровье.
+            energy (int): энергия.
+        """
+        self._hunger = MIN_HUNGER
+        self._hp = MAX_HP
+        self._energy = MAX_ENERGY
 
     def feed(self, food: Food) -> None:
         """
@@ -174,7 +183,8 @@ class MyTamagochi(AbstractTamagochi):
         return self._hp > MIN_HP
 
     def is_sick(self) -> bool:
-        """Метод для проверки, не заболел ли тамагочи.
+        """
+        Метод для проверки, не заболел ли тамагочи.
 
         Возвращает:
             bool: True, если питомец болен, иначе False.
@@ -183,11 +193,13 @@ class MyTamagochi(AbstractTamagochi):
                 or self._energy <= MIN_ENERGY)
 
     def update(self) -> None:
-        """Метод обновляет состояния тамагочи после каждого хода."""
-        # Стандартная динамика.
+        """
+        Метод обновляет состояния тамагочи после каждого хода.
+
+        Если питомец болен, дополнительно уменьшается здоровье.
+        """
         self._energy = max(MIN_ENERGY, self._energy - 5)
         self._hunger = min(MAX_HUNGER, self._hunger + 5)
 
-        # Если питомец болен, дополнительно уменьшается здоровье.
         if self.is_sick():
             self._hp = max(MIN_HP, self._hp - 5)

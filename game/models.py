@@ -5,11 +5,18 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True, slots=True)
 class Food:
-    """Модель объекта еды."""
+    """
+    Модель объекта еды.
 
-    name: str  # Наименование.
-    satiety: int  # На сколько единиц утоляет голод.
-    price: int  # Стоимость.
+    Атрибуты:
+        name (str): наименование.
+        satiety (int): утоляет голод на указанное количество единиц.
+        price (int): стоимость продукта.
+    """
+
+    name: str
+    satiety: int
+    price: int
 
     def __repr__(self) -> str:
         """Метод для красивого принтинга объекта."""
@@ -21,13 +28,22 @@ class Food:
 
 @dataclass
 class Medicine:
-    """Модель объекта лекарства."""
+    """
+    Модель объекта лекарства.
 
-    name: str  # Наименование.
-    price: int  # Стоимость.
-    heal_hp: int  # Сколько лечит HP.
-    number_of_uses: int  # Максимальное количество применений.
-    uses: int = 0  # Текущее количество применений.
+    Атрибуты:
+        name (str): наименование.
+        price (int): стоимость.
+        heal_hp (int): сколько лечит HP.
+        number_of_uses (int): максимальное количество применений.
+        uses (int): текущее количество применений (по умолчанию 0).
+    """
+
+    name: str
+    price: int
+    heal_hp: int
+    number_of_uses: int
+    uses: int = 0
 
     def is_empty(self) -> bool:
         """

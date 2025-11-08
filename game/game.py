@@ -28,7 +28,8 @@ class AbstractGame(ABC):
         all_food: list[Food],
         all_medicine: list[Medicine]
     ):
-        """Абстрактный метод инициализации класса игры.
+        """
+        Абстрактный метод инициализации класса игры.
 
         Аргументы:
             tamagochi (AbstractTamagochi): экземпляр класса тамагочи.
@@ -57,7 +58,8 @@ class AbstractGame(ABC):
 
     @abstractmethod
     def buy_food(self) -> None:
-        """Абстрактный метод для покупки еды для питомца.
+        """
+        Абстрактный метод для покупки еды для питомца.
 
         Исключения:
             NotImplementedError: метод должен быть реализован в наследнике.
@@ -66,7 +68,8 @@ class AbstractGame(ABC):
 
     @abstractmethod
     def buy_medicine(self) -> None:
-        """Абстрактный метод для покупки лекарства для питомца.
+        """
+        Абстрактный метод для покупки лекарства для питомца.
 
         Исключения:
             NotImplementedError: метод должен быть реализован в наследнике.
@@ -75,7 +78,8 @@ class AbstractGame(ABC):
 
     @abstractmethod
     def feed_tamagochi(self) -> None:
-        """Абстрактный метод для кормления тамагочи.
+        """
+        Абстрактный метод для кормления тамагочи.
 
         Исключения:
             NotImplementedError: метод должен быть реализован в наследнике.
@@ -84,7 +88,8 @@ class AbstractGame(ABC):
 
     @abstractmethod
     def heal_tamagochi(self) -> None:
-        """Абстрактный метод для лечения тамагочи.
+        """
+        Абстрактный метод для лечения тамагочи.
 
         Исключения:
             NotImplementedError: метод должен быть реализован в наследнике.
@@ -93,7 +98,8 @@ class AbstractGame(ABC):
 
     @abstractmethod
     def rest_tamagochi(self):
-        """Абстрактный метод для отдыха тамагочи.
+        """
+        Абстрактный метод для отдыха тамагочи.
 
         Исключения:
             NotImplementedError: метод должен быть реализован в наследнике.
@@ -102,7 +108,8 @@ class AbstractGame(ABC):
 
     @abstractmethod
     def play_with_tamagochi(self):
-        """Абстрактный метод для игры с тамагочи.
+        """
+        Абстрактный метод для игры с тамагочи.
 
         Исключения:
             NotImplementedError: метод должен быть реализован в наследнике.
@@ -161,18 +168,31 @@ class NewGame(AbstractGame):
         all_food: list[Food],
         all_medicine: list[Medicine]
     ):
-        """Метод инициализации класса игры."""
-        self.tamagochi = tamagochi  # Экземпляр питомца.
-        self.clicker = clicker  # Экземпляр кликера.
-        self.all_food = all_food  # Каталог всех продуктов.
-        self.all_medicine = all_medicine  # Каталог всех лекарств.
-        self._coins = START_COINS  # Кошелек игрока.
+        """
+        Метод инициализации класса игры.
+
+        Аргументы:
+            tamagochi (AbstractTamagochi): экземпляр питомца.
+            clicker (AbstractClicker): экземпляр кликера.
+            all_food (list[Food]): каталог всех продуктов.
+            all_medicine (list[Medicine]): каталог всех лекарств.
+
+        Атрибуты экземпляра:
+            self._coins (int): кошелек игрока, стартовое значение START_COINS.
+            self._inventory (dict[str, list]): сумка с купленными продуктами.
+        """
+        self.tamagochi = tamagochi
+        self.clicker = clicker
+        self.all_food = all_food
+        self.all_medicine = all_medicine
+        self._coins = START_COINS
         self._inventory: dict[str, list] = {
             'food': [],
-            'medicine': []}  # Сумка с купленными продуктами.
+            'medicine': []}
 
     def work(self) -> int:
-        """Метод для логики действия 'работа'.
+        """
+        Метод для логики действия 'работа'.
 
         Возвращает:
             int: количество заработанных монет.
@@ -187,29 +207,36 @@ class NewGame(AbstractGame):
         self.__buy_item(self.all_food, self.__add_food_to_inventory)
 
     def feed_tamagochi(self) -> None:
-        """Метод для кормления тамагочи."""
-        if self._inventory['food']:
-            # Берём первый элемент и удаляем из списка
-            food = self._inventory['food'].pop(0)
-            self.tamagochi.feed(food)
-            return
-        raise NotEnoughFood()
+        """
+        Метод для кормления тамагочи.
+
+        Берём первый элемент и удаляем из списка.
+        """
+        if not self._inventory['food']:
+            raise NotEnoughFood()
+
+        food = self._inventory['food'].pop(0)
+        self.tamagochi.feed(food)
 
     def buy_medicine(self) -> None:
         """Метод для покупки лекарства."""
         self.__buy_item(self.all_medicine, self.__add_medicine_to_inventory)
 
     def heal_tamagochi(self) -> None:
-        """Метод для лечения тамагочи."""
-        if self._inventory['medicine']:
-            medicine = self._inventory['medicine'][0]
-            self.tamagochi.heal(medicine)
-            medicine.uses += 1
-            # Если лекарство использовано полностью, то удаляем из инвентаря.
-            if medicine.is_empty():
-                self._inventory['medicine'].pop(0)
-            return
-        raise NotEnoughMedicine()
+        """
+        Метод для лечения тамагочи.
+
+        Если лекарство использовано полностью, то удаляем из инвентаря.
+        """
+        if not self._inventory['medicine']:
+            raise NotEnoughMedicine()
+
+        medicine = self._inventory['medicine'][0]
+        self.tamagochi.heal(medicine)
+        medicine.uses += 1
+
+        if medicine.is_empty():
+            self._inventory['medicine'].pop(0)
 
     def rest_tamagochi(self):
         """Метод для отдыха тамагочи."""
@@ -220,7 +247,8 @@ class NewGame(AbstractGame):
         self.tamagochi.play()
 
     def get_status(self) -> dict[str, Any]:
-        """Метод для получения характеристик тамагочи,
+        """
+        Метод для получения характеристик тамагочи,
         количества монет в кошельке игрока,
         а также для обработки смерти питомца.
 
@@ -258,7 +286,9 @@ class NewGame(AbstractGame):
         return self._inventory['medicine']
 
     def __buy_item(self, items: list, add_to_inventory_func) -> None:
-        """Универсальный метод для покупки еды или лекарства.
+        """
+        Универсальный метод для покупки еды или лекарства.
+
         Игрок выбирает товар из списка.
 
         Исключения:
