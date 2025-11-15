@@ -5,8 +5,7 @@ from game.tamagochi import MyTamagochi
 from game.clicker import Clicker
 from game.constants import STATUS_TEMPLATE, TAMAGOCHI_IS_SICK, PLAYER_ACTIONS
 from game.game import NewGame
-from game.exceptions import (NotEnoughMoney, NotEnoughFood,
-                             NotEnoughMedicine, TamagochiIsGone)
+from game.exceptions import (NotEnoughError, TamagochiIsGone)
 
 
 def main():
@@ -72,7 +71,7 @@ def main():
                 case _:
                     output = "Неверная команда"
 
-        except (NotEnoughMoney, NotEnoughFood, NotEnoughMedicine) as e:
+        except NotEnoughError as e:
             print(e)
             input("Нажмите Enter для продолжения игры.")
 

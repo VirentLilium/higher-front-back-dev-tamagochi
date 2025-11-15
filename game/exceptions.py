@@ -8,21 +8,25 @@ class TamagochiIsGone(Exception):
         super().__init__(message)
 
 
-class NotEnoughMoney(Exception):
+class NotEnoughError(Exception):
+    """Ошибка недостатка ресурсов."""
+
+
+class NotEnoughMoney(NotEnoughError):
     """Ошибка, когда не хватает монет для покупки."""
 
     def __init__(self, message='У вас не хватает монет на покупку товара!'):
         super().__init__(message)
 
 
-class NotEnoughFood(Exception):
+class NotEnoughFood(NotEnoughError):
     """Ошибка, когда в сумке нет еды."""
 
     def __init__(self, message='У вас в сумке нет еды!'):
         super().__init__(message)
 
 
-class NotEnoughMedicine(Exception):
+class NotEnoughMedicine(NotEnoughError):
     """Ошибка, когда в сумке нет лекарств."""
 
     def __init__(self, message='У вас в сумке нет лекарств!'):
