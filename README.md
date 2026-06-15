@@ -78,7 +78,7 @@ tamagochi/
 ### Клонирование репозитория
 
 ```bash
-git clone <repository_url>
+git clone https://github.com/VirentLilium/higher-front-back-dev-tamagochi.git
 cd higher-front-back-dev-tamagochi
 ```
 
