@@ -1,34 +1,27 @@
-"""Модуль с интерфейсом и реализацией кликера.
-
-Содержит:
-    - AbstractClicker: интерфейс кликера.
-    - Clicker: реализация кликера со случайным доходом за клик.
-"""
+"""Модуль с интерфейсом и реализацией кликера."""
 
 from abc import ABC, abstractmethod
 from random import randint
 
 
 class AbstractClicker(ABC):
-    """Интерфейс для кликера."""
+    """Интерфейс кликера."""
 
     @abstractmethod
     def __init__(self) -> None:
         """
-        Абстрактный метод инициализации.
+        Инициализирует объект кликера.
 
-        Исключения:
-            NotImplementedError: метод должен быть реализован в наследнике.
+        :raises NotImplementedError: Если метод не реализован в наследнике.
         """
         raise NotImplementedError
 
     @abstractmethod
     def click(self) -> None:
         """
-        Абстрактный метод клика для накапливания монет.
+        Выполняет клик и обновляет доход.
 
-        Исключения:
-            NotImplementedError: метод должен быть реализован в наследнике.
+        :raises NotImplementedError: Если метод не реализован в наследнике.
         """
         raise NotImplementedError
 
@@ -36,24 +29,23 @@ class AbstractClicker(ABC):
     @abstractmethod
     def income_per_click(self) -> int:
         """
-        Абстрактное свойство для доступа к количеству монет за клик.
+        Возвращает доход за последний клик.
 
-        Исключения:
-            NotImplementedError: метод должен быть реализован в наследнике.
+        :return: Количество заработанных монет.
+        :raises NotImplementedError: Если свойство не реализовано в наследнике.
         """
         raise NotImplementedError
 
 
 class Clicker(AbstractClicker):
-    """Класс кликера. Реализация кликера со случайным доходом за клик."""
+    """Реализация кликера со случайным доходом за клик."""
 
     def __init__(self, min_coins: int, max_coins: int) -> None:
         """
-        Инициализация кликера.
+        Инициализирует кликер.
 
-        Аргументы:
-            min_coins (int): минимальное количество монет за клик.
-            max_coins (int): максимальное количество монет за клик.
+        :param min_coins: Минимальное количество монет за клик.
+        :param max_coins: Максимальное количество монет за клик.
         """
         self._min_coins = min_coins
         self._max_coins = max_coins
@@ -61,9 +53,16 @@ class Clicker(AbstractClicker):
 
     @property
     def income_per_click(self) -> int:
-        """Возвращает количество заработанных монет за последний клик."""
+        """
+        Возвращает доход за последний клик.
+
+        :return: Количество заработанных монет.
+        """
         return self._income_per_click
 
     def click(self) -> None:
-        """Выбирает случайное количество монет за клик."""
-        self._income_per_click = randint(self._min_coins, self._max_coins)
+        """Генерирует случайный доход за один клик."""
+        self._income_per_click = randint(
+            self._min_coins,
+            self._max_coins,
+        )

@@ -6,12 +6,11 @@ from dataclasses import dataclass
 @dataclass(frozen=True, slots=True)
 class Food:
     """
-    Модель объекта еды.
+    Модель еды.
 
-    Атрибуты:
-        name (str): наименование.
-        satiety (int): утоляет голод на указанное количество единиц.
-        price (int): стоимость продукта.
+    :param name: Название продукта.
+    :param satiety: Количество единиц сытости.
+    :param price: Стоимость продукта.
     """
 
     name: str
@@ -19,24 +18,27 @@ class Food:
     price: int
 
     def __repr__(self) -> str:
-        """Метод для красивого принтинга объекта."""
+        """
+        Возвращает строковое представление объекта еды.
+
+        :return: Информация о продукте.
+        """
         return (
-            f"{self.name} стоимость: {self.price}, "
-            f"утоляет голод на {self.satiety} единиц."
+            f'{self.name} стоимость: {self.price}, '
+            f'утоляет голод на {self.satiety} единиц.'
         )
 
 
 @dataclass
 class Medicine:
     """
-    Модель объекта лекарства.
+    Модель лекарства.
 
-    Атрибуты:
-        name (str): наименование.
-        price (int): стоимость.
-        heal_hp (int): сколько лечит HP.
-        number_of_uses (int): максимальное количество применений.
-        uses (int): текущее количество применений (по умолчанию 0).
+    :param name: Название лекарства.
+    :param price: Стоимость лекарства.
+    :param heal_hp: Количество восстанавливаемого здоровья.
+    :param number_of_uses: Максимальное количество использований.
+    :param uses: Текущее количество использований.
     """
 
     name: str
@@ -49,13 +51,17 @@ class Medicine:
         """
         Проверяет, осталось ли еще лекарство.
 
-        Возвращает:
-            bool: True, если лекарство закончилось, иначе False.
+        :return: True, если количество использований исчерпано,
+            иначе False.
         """
         return self.uses >= self.number_of_uses
 
     def __repr__(self) -> str:
-        """Метод для красивого принтинга объекта."""
+        """
+        Возвращает строковое представление объекта лекарства.
+
+        :return: Информация о лекарстве.
+        """
         return (
             f'{self.name} стоимость: {self.price}, '
             f'лечит на {self.heal_hp} HP, использований: '
